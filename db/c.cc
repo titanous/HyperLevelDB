@@ -15,6 +15,7 @@
 #include "hyperleveldb/options.h"
 #include "hyperleveldb/status.h"
 #include "hyperleveldb/write_batch.h"
+#include "util/backup_env.h"
 
 using leveldb::Cache;
 using leveldb::Comparator;
@@ -573,6 +574,17 @@ leveldb_env_t* leveldb_create_default_env() {
   result->rep = Env::Default();
   result->is_default = true;
   return result;
+}
+
+leveldb_env_t* leveldb_create_backup_env() {
+  leveldb_env_t* result = new leveldb_env_t;
+  result->rep = (leveldb::Env*)new leveldb::BackupEnv(Env::Default());
+  result->is_default = false;
+  return result;
+}
+
+void leveldb_backup(leveldb_env_t* env, const char* dir, leveldb_backup_func_t func, void* arg, char** errptr) {
+  SaveError(errptr, ((leveldb::BackupEnv*)env->rep)->Backup(std::string(dir), func, arg));
 }
 
 void leveldb_env_destroy(leveldb_env_t* env) {

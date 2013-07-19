@@ -67,6 +67,7 @@ typedef struct leveldb_snapshot_t      leveldb_snapshot_t;
 typedef struct leveldb_writablefile_t  leveldb_writablefile_t;
 typedef struct leveldb_writebatch_t    leveldb_writebatch_t;
 typedef struct leveldb_writeoptions_t  leveldb_writeoptions_t;
+typedef int (*leveldb_backup_func_t)(void*, const char*, uint64_t length);
 
 /* DB operations */
 
@@ -267,9 +268,12 @@ extern void leveldb_cache_destroy(leveldb_cache_t* cache);
 /* Env */
 
 extern leveldb_env_t* leveldb_create_default_env();
+extern leveldb_env_t* leveldb_create_backup_env();
 extern void leveldb_env_destroy(leveldb_env_t*);
 
 /* Utility */
+
+extern void leveldb_backup(leveldb_env_t* env, const char* dir, leveldb_backup_func_t func, void* arg, char** errptr);
 
 /* Calls free(ptr).
    REQUIRES: ptr was malloc()-ed and returned by one of the routines
